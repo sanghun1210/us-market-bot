@@ -1,0 +1,8 @@
+pandas-datareader==0.10.0
+pandas-ta==0.3.14b
+beautifulsoup4==4.12.3
+plotly==5.22.0
+python-dotenv
+polygon-api-client==1.13.7
+streamlit==1.35.0
+matplotlib==3.9.0
