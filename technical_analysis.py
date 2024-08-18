@@ -45,19 +45,27 @@ def pattern3_check(weekly_df) :
 
 def pattern4_check(df) :
     res = algorithms.adx(df['h'], df['l'], df['c'], 14)
-    if algorithms.macd_line_over_than_signal2(df, 12, 26, 9) and \
-        res['DMP_14'].iloc[-1] > res['DMN_14'].iloc[-1] and \
-        res['ADX_14'].iloc[-1] < res['DMP_14'].iloc[-1] and res['ADX_14'].iloc[-1] >= res['DMN_14'].iloc[-1]:
-        sma13 = algorithms.sma(df,13)
-        sma30 = algorithms.sma(df,30)
-        if sma13.iloc[-1] > sma30.iloc[-1] :
-            return True
+    ema14 = algorithms.ema(df, 14)
+    sma20 = df['c'].rolling(window=20).mean()
+    cci14 = algorithms.get_current_cci(df, 14)
+    if algorithms.macd_line_over_than_signal2(df, 12, 26, 9) and df['c'].iloc[-1] > sma20.iloc[-1] and \
+        res['DMP_14'].iloc[-1] >= res['DMN_14'].iloc[-1] :
+        return True
     return False
 
 def pattern4_1_check(df) :
-    #slow_k, slow_d = algorithms.stc_slow(df, 14, 3, 3)
-    slow_k, slow_d = algorithms.stc_slow(df, 14, 3, 3)
-    if slow_d.iloc[-1] < 30: 
+    ema14 = algorithms.ema(df, 14)
+    res = algorithms.adx(df['h'], df['l'], df['c'], 14)
+    if algorithms.macd_line_over_than_signal2(df, 12, 26, 9) and df['c'].iloc[-1] > ema14.iloc[-1] and \
+        res['DMP_14'].iloc[-1] > res['DMN_14'].iloc[-1] :
+        return True
+    return False
+
+def pattern4_2_check(df) :
+    MACD_line, MACD_Signal_line, MACD_Histogram = algorithms.macd2(df, 12, 26, 9)
+    slow_k, slow_d = algorithms.stc_slow(df, 9, 3, 3)
+    ema9 = algorithms.ema(df, 9)
+    if slow_d.iloc[-1] < 30 and slow_k < 30 :
         return True
     return False
 

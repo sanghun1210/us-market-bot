@@ -82,10 +82,61 @@ def get_daily_bars(ticker):
     #print(df.tail())
     return df
 
+def get_hourly_bars(ticker):
+    start_date, end_date = get_period()
+    api_key = os.getenv('POLYGON_API_KEY')
+    url = ("https://api.polygon.io/v2/aggs/ticker/{}/range/1/hour/{}/{}?adjusted=true&sort=asc&apiKey={}".format(ticker, start_date, end_date, api_key))
+    data_dict = get_jsonparsed_data(url)
+    #print(data_dict)
+
+    # JSON 데이터에서 'results' 키의 값을 추출하여 DataFrame 생성
+    data = data_dict['results']
+    df = pd.DataFrame(data)
+
+    # 타임스탬프를 날짜로 변환
+    df['t'] = pd.to_datetime(df['t'], unit='ms')
+
+    # 데이터프레임 확인
+    #print(df.tail())
+    return df
+
+def extract_insights(results, ticker):
+    insights = []
+    for data in results:
+        for insight in data['insights']:
+            if insight['ticker'] == ticker:
+                insights.append(insight)
+    return insights
+
+
+def get_daily_news(ticker, limit=10):
+    api_key = os.getenv('POLYGON_API_KEY')
+    url = ("https://api.polygon.io/v2/reference/news?ticker={}&limit={}&apiKey={}".format(ticker, limit, api_key))
+    data_dict = get_jsonparsed_data(url)
+    #print(data_dict)
+
+    # JSON 데이터에서 'results' 키의 값을 추출하여 DataFrame 생성
+    results = data_dict['results']
+    insights = extract_insights(results, ticker)
+    #print(insights)
+    for insight in insights:
+        print(insight['sentiment'])
+
+
+    # df = pd.DataFrame(data)
+
+    # print(df)
+    # df.head()
+    # print(df.iloc[0]['insights'])
+
+    # df
+
+
 def main():
     load_dotenv()
     #symbols = get_tickers()
-    get_weekly_bars("AAPL")
+    df = get_hourly_bars("LMFA")
+    print(df)
 
 
 if __name__ == "__main__":
